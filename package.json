@@ -10,7 +10,7 @@
     "prepack": "yarn build",
     "release": "yarn build && git add -A && git commit -m \"chore: build dist\" && npm version patch && git push && git push --tags"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@angular-devkit/core": ">=17 <18",
     "@angular-devkit/schematics": ">=17 <18",
     "@schematics/angular": ">=17 <18"
