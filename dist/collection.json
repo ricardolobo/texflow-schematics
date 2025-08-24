@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/schematics",
+  "schematics": {
+    "handler": {
+      "description": "Gera um event handler (NestJS EventEmitter) e regista no módulo.",
+      "factory": "./handler/index#handlerSchematic",
+      "schema": "./handler/schema.json"
+    },
+    "event": {
+      "description": "Gera uma classe de evento de domínio.",
+      "factory": "./event/index#eventSchematic",
+      "schema": "./event/schema.json"
+    }
+  }
+}
+

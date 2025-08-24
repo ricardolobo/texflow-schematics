@@ -1,0 +1,32 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id": "NestEventHandlerSchema",
+    "title": "Event Handler Options",
+    "type": "object",
+    "additionalProperties": true,
+    "properties": {
+	"name": {
+	    "type": "string",
+	    "description": "Nome completo do evento (ex.: process.reconciliation.completed).",
+	    "$default": { "$source": "argv", "index": 0 }
+	},
+	"moduleName": {
+	    "type": "string",
+	    "description": "Nome lógico do módulo (ex.: process-actors).",
+	    "$default": { "$source": "argv", "index": 1 }
+	},
+	"directory": {
+	    "type": "string",
+	    "description": "(Opcional) Override do diretório base (ex.: src/process-actors)."
+	},
+	"module": {
+	    "type": "string",
+	    "description": "(Opcional) Override do ficheiro do módulo (ex.: src/process-actors/process-actors.module.ts)."
+	},
+	"path": {
+	    "type": "string",
+	    "description": "(Interno do Nest CLI) — será ignorado, mas aceito."
+	}
+    },
+    "required": ["name"]
+}

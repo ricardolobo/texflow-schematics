@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "NestEventHandlerSchema",
+  "title": "Event Handler Options",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nome completo do evento (ex.: process.reconciliation.completed).",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
+    "module": {
+      "type": "string",
+      "description": "Caminho para o módulo alvo (ex.: src/process-actors/process-actors.module.ts)."
+    },
+    "directory": {
+      "type": "string",
+      "description": "Diretório base do módulo onde criar a pasta events/ (ex.: src/process-actors)."
+    }
+  },
+  "required": ["name", "module", "directory"]
+}

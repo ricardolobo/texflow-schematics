@@ -1,0 +1,28 @@
+{
+  "name": "texflow-schematics",
+  "version": "1.0.0",
+  "private": false,
+  "schematics": "./dist/collection.json",
+  "files": ["dist/**", "README.md", "LICENSE"],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "yarn clean && tsc -p tsconfig.json && cpx \"src/handler/files/**/*\" dist/handler/files && cpx src/handler/schema.json dist/handler/ && cpx \"src/event/files/**/*\" dist/event/files && cpx src/event/schema.json dist/event/ && cpx src/collection.json dist/",
+    "prepack": "yarn build",
+    "release": "yarn build && git add -A && git commit -m \"chore: build dist\" && npm version patch && git push && git push --tags"
+  },
+  "peerDependencies": {
+    "@angular-devkit/core": ">=17 <18",
+    "@angular-devkit/schematics": ">=17 <18",
+    "@schematics/angular": ">=17 <18"
+  },
+  "devDependencies": {
+    "@angular-devkit/core": "17.3.4",
+    "@angular-devkit/schematics": "17.3.4",
+    "@schematics/angular": "17.3.4",
+    "typescript": "5.3.3",
+    "@types/node": "18.19.44",
+    "cpx": "^1.5.0",
+    "rimraf": "^5.0.0"
+  }
+}
+

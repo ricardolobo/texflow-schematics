@@ -1,0 +1,57 @@
+Arguments: 
+  /home/lobo/.nvm/versions/node/v17.9.1/bin/node /usr/share/yarn/bin/yarn.js install
+
+PATH: 
+  /home/lobo/.yarn/bin:/usr/lib/jvm/java-11-openjdk-amd64/bin:/home/lobo/.deno/bin:/home/lobo/.cask/bin:/home/lobo/.nvm/versions/node/v17.9.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/home/lobo/.local/bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  17.9.1
+
+Platform: 
+  linux x64
+
+Trace: 
+  SyntaxError: /home/lobo/repos/texflow-schematics/package.json: Unexpected token / in JSON at position 515
+      at JSON.parse (<anonymous>)
+      at /usr/share/yarn/lib/cli.js:1629:59
+      at Generator.next (<anonymous>)
+      at step (/usr/share/yarn/lib/cli.js:310:30)
+      at /usr/share/yarn/lib/cli.js:321:13
+
+npm manifest: 
+  {
+    "name": "texflow-schematics",
+    "version": "1.0.0",
+    "private": false,
+    "schematics": "./dist/collection.json",
+    "files": ["dist/**", "README.md", "LICENSE"],
+    "scripts": {
+      "clean": "rimraf dist",
+      "build": "yarn clean && tsc -p tsconfig.json && cpx \"src/handler/files/**/*\" dist/handler/files && cpx src/handler/schema.json dist/handler/ && cpx \"src/event/files/**/*\" dist/event/files && cpx src/event/schema.json dist/event/ && cpx src/collection.json dist/",
+      "prepack": "yarn build",      // compila ao publicar (npm/tarball)
+      "release": "yarn build && git add -A && git commit -m \"chore: build dist\" && npm version patch && git push && git push --tags"
+    },
+    "peerDependencies": {
+      "@angular-devkit/core": ">=17 <18",
+      "@angular-devkit/schematics": ">=17 <18",
+      "@schematics/angular": ">=17 <18"
+    },
+    "devDependencies": {
+      "@angular-devkit/core": "17.3.4",
+      "@angular-devkit/schematics": "17.3.4",
+      "@schematics/angular": "17.3.4",
+      "typescript": "5.3.3",
+      "@types/node": "18.19.44",
+      "cpx": "^1.5.0",
+      "rimraf": "^5.0.0"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

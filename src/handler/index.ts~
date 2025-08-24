@@ -1,0 +1,107 @@
+import {
+    Rule,
+    SchematicContext,
+    Tree,
+    apply,
+    url,
+    template,
+    move,
+    chain,
+    mergeWith,
+} from '@angular-devkit/schematics';
+import { strings } from '@angular-devkit/core';
+import {
+    addProviderToModule,
+    insertImport,
+} from '@schematics/angular/utility/ast-utils';
+import { getSourceFile } from '@schematics/angular/utility/ast-utils';
+import { InsertChange } from '@schematics/angular/utility/change';
+import { buildRelativePath } from '@schematics/angular/utility/find-module';
+import * as ts from 'typescript';
+
+export interface Options {
+    name: string;       // event name: process.reconciliation.completed
+    module: string;     // path to module: src/process-actors/process-actors.module.ts
+    directory: string;  // base dir of module: src/process-actors
+}
+
+function toClassName(eventName: string): string {
+    // transforma 'process-actor.reconciliation.completed'
+    // em 'ProcessActorReconciliationCompleted'
+    const parts = eventName.split(/[.-]/g).filter(Boolean);
+    return parts.map(p => strings.classify(p)).join('') + 'Handler';
+}
+
+export function handlerSchematic(options: Options): Rule {
+    return (tree: Tree, context: SchematicContext) => {
+        const eventName = options.name.trim();
+        const className = toClassName(eventName);
+
+        // Caminho final do ficheiro: <directory>/events/<eventName>.handler.ts
+        const targetDir = `${options.directory.replace(/\/$/, '')}/events`;
+        const fileBase = eventName; // mantém pontos e hífens
+        const targetPath = `${targetDir}/${fileBase}.handler.ts`;
+
+        // 1) Gerar o ficheiro a partir do template
+        const generateFile = mergeWith(
+            apply(url('./files'), [
+                template({
+                    ...strings,
+                    className,
+                    eventName,
+                    fileBase, // usado no nome do ficheiro __fileBase__.handler.ts.template
+                }),
+                move(targetDir),
+            ])
+        );
+
+        // 2) Atualizar o módulo para registar o provider
+        const updateModule: Rule = (treeInner: Tree) => {
+            const modulePath = options.module;
+            if (!treeInner.exists(modulePath)) {
+                throw new Error(`Módulo não encontrado: ${modulePath}`);
+            }
+
+            const sourceText = treeInner.read(modulePath)!.toString('utf-8');
+            const sourceFile = ts.createSourceFile(
+                modulePath,
+                sourceText,
+                ts.ScriptTarget.Latest,
+                true
+            );
+
+            // import relativo para o handler
+            const relativePath = buildRelativePath(modulePath, targetPath).replace(/\.ts$/, '');
+            const importChanges = insertImport(
+                sourceFile,
+                modulePath,
+                className,
+                relativePath
+            ) as InsertChange;
+
+            const providerChanges = addProviderToModule(
+                sourceFile,
+                modulePath,
+                className,
+                relativePath
+            ) as InsertChange[];
+
+            const recorder = treeInner.beginUpdate(modulePath);
+            // aplicar import
+            if (importChanges.toAdd) {
+                recorder.insertLeft(importChanges.pos, importChanges.toAdd);
+            }
+            // aplicar providers
+            providerChanges.forEach(change => {
+                if (change.toAdd) {
+                    recorder.insertLeft(change.pos, change.toAdd);
+                }
+            });
+            treeInner.commitUpdate(recorder);
+
+            return treeInner;
+        };
+
+        return chain([generateFile, updateModule])(tree, context);
+    };
+}
